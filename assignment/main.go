@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"sort"
+	"time"
 )
 
 func main() {
@@ -24,7 +26,7 @@ func main() {
 	// canMakeArithmeticProgression([]int{5, 1, 9})    // true; 9, 5, 1 adalah baris aritmatik -4
 	// canMakeArithmeticProgression([]int{1, 2, 4, 8}) // false; 1, 2, 4, 8 bukan baris aritmatik, melainkan geometrik x2
 
-	// tesDeck()
+	tesDeck()
 }
 
 // https://leetcode.com/problems/sign-of-the-product-of-an-array
@@ -121,18 +123,24 @@ type Card struct {
 // assume Ace-Spade on top of deck.
 func (d *Deck) New() {
 	// write code here
+	symbols := []int{0, 1, 2, 3}
+	for _, symbol := range symbols {
+		for number := 1; number <= 13; number++ {
+			d.cards = append(d.cards, Card{symbol: symbol, number: number})
+		}
+	}
 }
 
 // PeekTop return n cards from the top
 func (d Deck) PeekTop(n int) []Card {
 	// write code here
-	return nil
+	return d.cards[len(d.cards)-n:]
 }
 
 // PeekTop return n cards from the bottom
 func (d Deck) PeekBottom(n int) []Card {
 	// write code here
-	return nil
+	return d.cards[:n]
 }
 
 // PeekCardAtIndex return a card at specified index
@@ -142,13 +150,27 @@ func (d Deck) PeekCardAtIndex(idx int) Card {
 
 // Shuffle randomly shuffle the deck
 func (d *Deck) Shuffle() {
-	// write code here
+	// Seed the random number generator
+	rand.Seed(time.Now().UnixNano())
+
+	// Fisher-Yates shuffle algorithm
+	n := len(d.cards)
+	for i := n - 1; i > 0; i-- {
+		j := rand.Intn(i + 1)                           // Generate a random index from 0 to i
+		d.cards[i], d.cards[j] = d.cards[j], d.cards[i] // Swap cards
+	}
 }
 
 // Cut perform single "Cut" technique. Move n top cards to bottom
 // e.g. Deck: [1, 2, 3, 4, 5]. Cut(3) resulting Deck: [4, 5, 1, 2, 3]
 func (d *Deck) Cut(n int) {
 	// write code here
+	// Split the deck into two parts
+	top := d.cards[:n]    // Top n cards
+	bottom := d.cards[n:] // Remaining cards
+
+	// Reassemble the deck: bottom part first, then top part
+	d.cards = append(bottom, top...)
 }
 
 func (c Card) ToString() string {
